@@ -1,0 +1,51 @@
+/* app/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --aria-bg: #0D0D0F;
+  --aria-surface: #141416;
+  --aria-border: #1F1F23;
+  --aria-text: #F5F5F5;
+  --aria-muted: #6B7280;
+  --aria-violet: #6C63FF;
+  --aria-green: #22C55E;
+  --aria-amber: #F59E0B;
+  --aria-red: #EF4444;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--aria-bg);
+  color: var(--aria-text);
+  min-height: 100vh;
+}
+
+/* Rescue mode body override */
+body.rescue-mode {
+  background: #1A1200;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2D2D32; border-radius: 2px; }
+
+/* Shimmer skeleton */
+.skeleton {
+  background: linear-gradient(90deg, #1F1F23 25%, #2A2A30 50%, #1F1F23 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid var(--aria-violet);
+  outline-offset: 2px;
+}
+
+/* Prose reset for email drafts */
+.email-body p { margin-bottom: 0.75rem; }
+.email-body p:last-child { margin-bottom: 0; }
