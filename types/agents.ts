@@ -146,6 +146,8 @@ export interface Task {
   created_at: number
   updated_at: number
   subtasks: Subtask[]
+  sprint_blocks?: SprintBlock[]
+  reasoning?: string
   rescue_plan?: {
     activated_at: number
     available_minutes: number
