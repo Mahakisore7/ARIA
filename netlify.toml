@@ -1,0 +1,9 @@
+[build]
+  # Force the base directory to be the repository root
+  base = ""
+  
+  # Standard Next.js build command
+  command = "npm run build"
+  
+  # Publish directory for Next.js
+  publish = ".next"
