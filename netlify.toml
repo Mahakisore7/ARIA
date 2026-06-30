@@ -4,6 +4,3 @@
   
   # Standard Next.js build command
   command = "npm run build"
-  
-  # Publish directory for Next.js
-  publish = ".next"
