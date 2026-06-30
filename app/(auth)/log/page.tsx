@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext'
 import { ActionLog } from '@/components/aria/ActionLog'
 import { Button } from '@/components/ui/index'
 import Link from 'next/link'
+import { ArrowLeft, Activity } from 'lucide-react'
 
 export default function LogPage() {
   const { user, loading } = useAuth()
@@ -16,28 +17,36 @@ export default function LogPage() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-aria-violet border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-neutral-primary-soft">
+        <div className="w-12 h-12 border-4 border-border-default border-t-brand rounded-full animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-aria-border px-4 sm:px-6 py-4 flex items-center gap-3">
-        <Link href="/dashboard"><Button variant="ghost" size="sm">← Dashboard</Button></Link>
-        <h1 className="text-base font-semibold text-aria-text">ARIA Activity Log</h1>
-        <div className="ml-auto flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-aria-green animate-pulse" />
-          <span className="text-xs text-aria-muted">Live</span>
+    <div className="min-h-screen bg-neutral-secondary-soft text-body font-sans">
+      <header className="border-b-4 border-border-default bg-neutral-primary px-6 py-4 flex items-center gap-4 shadow-md sticky top-0 z-20">
+        <Link href="/dashboard">
+          <Button variant="ghost" size="sm" className="px-2 border-2 border-border-default bg-neutral-secondary-medium hover:bg-neutral-tertiary-medium">
+            <ArrowLeft className="w-5 h-5 text-heading" />
+          </Button>
+        </Link>
+        <div className="flex items-center gap-3">
+          <Activity className="w-8 h-8 text-brand" strokeWidth={3} />
+          <h1 className="text-xl font-bold font-head text-heading uppercase tracking-tight">ARIA Activity Log</h1>
+        </div>
+        <div className="ml-auto flex items-center gap-2 border-2 border-border-default bg-neutral-primary px-3 py-1 shadow-xs">
+          <span className="w-3 h-3 rounded-none border-2 border-border-success bg-success animate-pulse shadow-xs" />
+          <span className="text-sm font-bold text-heading uppercase tracking-widest">Live</span>
         </div>
       </header>
-      <div className="max-w-2xl mx-auto p-4 sm:p-6">
-        <div className="mb-6 p-4 bg-aria-surface border border-aria-border rounded-xl">
-          <p className="text-xs text-aria-muted leading-relaxed">
-            Every action ARIA takes is logged here — the agent responsible, what it did, and why.
-            This is the complete audit trail of ARIA&apos;s autonomous decisions.
-            Click <span className="text-aria-violet font-medium">Why?</span> on any entry to see ARIA&apos;s full reasoning.
+      <div className="max-w-[800px] mx-auto p-6 lg:p-[48px]">
+        <div className="mb-8 p-6 bg-brand-soft border-4 border-border-brand shadow-lg relative overflow-hidden">
+          <div className="absolute -top-12 -right-12 w-32 h-32 bg-brand rounded-full border-4 border-border-brand opacity-20 pointer-events-none" />
+          <p className="text-lg font-bold text-heading leading-relaxed relative z-10 uppercase tracking-tight">
+            Every action ARIA takes is logged here — the agent responsible, what it did, and why. 
+            This is the complete audit trail of ARIA's autonomous decisions. <br/><br/>
+            Click <span className="bg-brand text-black px-2 py-0.5 border-2 border-black font-black uppercase inline-block -rotate-2 mx-1 shadow-xs">Why?</span> on any entry to see ARIA's full reasoning.
           </p>
         </div>
         <ActionLog />
