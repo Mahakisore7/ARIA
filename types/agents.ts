@@ -142,6 +142,7 @@ export interface Task {
   deadline_iso: string
   status: TaskStatus
   risk_level: RiskLevel
+  task_category?: TaskCategory
   mode_created: 'BUILD' | 'RESCUE'
   created_at: number
   updated_at: number
