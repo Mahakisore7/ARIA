@@ -1,21 +1,22 @@
 // lib/agents/core.ts
-import { getStructuredModel } from '@/lib/gemini/client'
-import { PROMPTS, SCHEMAS } from '@/lib/gemini/prompts'
+import { getGroqClient, GROQ_MODEL } from '@/lib/groq/client'
+import { PROMPTS, SCHEMAS } from '@/lib/groq/prompts'
 import type { IntentClassification } from '@/types/agents'
 
 export async function classifyIntent(userMessage: string): Promise<IntentClassification> {
-  const model = getStructuredModel(SCHEMAS.INTENT)
+  const groq = getGroqClient()
 
-  const result = await model.generateContent({
-    contents: [
-      {
-        role: 'user',
-        parts: [{ text: `${PROMPTS.CORE_INTENT}\n\nClassify this message: "${userMessage}"\n\nCurrent time: ${new Date().toISOString()}` }],
-      },
+  const result = await groq.chat.completions.create({
+    model: GROQ_MODEL,
+    messages: [
+      { role: 'system', content: PROMPTS.CORE_INTENT + '\n\nYou must return valid JSON matching this schema: ' + JSON.stringify(SCHEMAS.INTENT) },
+      { role: 'user', content: `Classify this message: "${userMessage}"\n\nCurrent time: ${new Date().toISOString()}` },
     ],
+    response_format: { type: 'json_object' },
+    temperature: 0.15,
+    max_tokens: 2048,
   })
 
-  const text = result.response.text()
-  const clean = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-  return JSON.parse(clean) as IntentClassification
+  const text = result.choices[0]?.message?.content || '{}'
+  return JSON.parse(text) as IntentClassification
 }

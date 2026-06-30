@@ -10,7 +10,7 @@ import { Button, Card } from '@/components/ui/index'
 import type { RescueResult, SprintBlock, RecipientType } from '@/types/agents'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { Siren, ArrowLeft, Check, AlertTriangle, Play, Pause, Copy, Mail, FileText, ChevronDown, ChevronUp } from 'lucide-react'
+import { Siren, ArrowLeft, Check, AlertTriangle, Play, Pause, Copy, Mail, FileText, ChevronDown, ChevronUp, Zap } from 'lucide-react'
 
 function SprintBlockCard({ block, active, locked, onComplete }: {
   block: SprintBlock; active: boolean; locked: boolean; onComplete: () => void

@@ -1,7 +1,4 @@
-// lib/gemini/prompts.ts
-// All system prompts versioned here. Never inline in agent files.
-// v1.0 - Vibe2Ship Hackathon June 2026
-
+// lib/groq/prompts.ts
 export const PROMPTS = {
   // ─── ARIA-Core: Intent Classification ────────────────────────────────────
   CORE_INTENT: `You are ARIA-Core, the orchestrating intelligence of ARIA (Autonomous Rescue & Intervention Agent).
@@ -122,133 +119,133 @@ reasoning: Explain the tone choices you made for this recipient type.
 Respond ONLY in the exact JSON schema provided. The draft must be ready to send with zero editing required.`,
 }
 
-// Schema definitions for structured outputs
+// Schema definitions for structured outputs (JSON Schema format)
 export const SCHEMAS = {
   INTENT: {
-    type: 'OBJECT',
+    type: 'object',
     properties: {
-      mode: { type: 'STRING', enum: ['BUILD', 'RESCUE', 'SHIELD', 'CLARIFY'] },
-      task_description: { type: 'STRING' },
-      deadline_iso: { type: 'STRING', nullable: true },
-      available_minutes: { type: 'NUMBER', nullable: true },
-      confidence: { type: 'NUMBER' },
-      clarification_needed: { type: 'STRING', nullable: true },
-      task_category: { type: 'STRING', enum: ['coding', 'writing', 'research', 'design', 'administrative', 'other'] },
+      mode: { type: 'string', enum: ['BUILD', 'RESCUE', 'SHIELD', 'CLARIFY'] },
+      task_description: { type: 'string' },
+      deadline_iso: { type: ['string', 'null'] },
+      available_minutes: { type: ['number', 'null'] },
+      confidence: { type: 'number' },
+      clarification_needed: { type: ['string', 'null'] },
+      task_category: { type: 'string', enum: ['coding', 'writing', 'research', 'design', 'administrative', 'other'] },
     },
     required: ['mode', 'task_description', 'confidence', 'task_category'],
   },
 
   SUBTASK_PLAN: {
-    type: 'OBJECT',
+    type: 'object',
     properties: {
-      feasible: { type: 'BOOLEAN' },
-      warning: { type: 'STRING', nullable: true },
+      feasible: { type: 'boolean' },
+      warning: { type: ['string', 'null'] },
       subtasks: {
-        type: 'ARRAY',
+        type: 'array',
         items: {
-          type: 'OBJECT',
+          type: 'object',
           properties: {
-            id: { type: 'STRING' },
-            title: { type: 'STRING' },
-            description: { type: 'STRING' },
-            estimated_minutes: { type: 'NUMBER' },
-            dependencies: { type: 'ARRAY', items: { type: 'STRING' } },
-            risk_flag: { type: 'BOOLEAN' },
-            risk_reason: { type: 'STRING', nullable: true },
-            completed: { type: 'BOOLEAN' },
+            id: { type: 'string' },
+            title: { type: 'string' },
+            description: { type: 'string' },
+            estimated_minutes: { type: 'number' },
+            dependencies: { type: 'array', items: { type: 'string' } },
+            risk_flag: { type: 'boolean' },
+            risk_reason: { type: ['string', 'null'] },
+            completed: { type: 'boolean' },
           },
           required: ['id', 'title', 'description', 'estimated_minutes', 'risk_flag', 'completed'],
         },
       },
-      total_estimated_minutes: { type: 'NUMBER' },
-      available_minutes: { type: 'NUMBER' },
-      critical_path: { type: 'ARRAY', items: { type: 'STRING' } },
+      total_estimated_minutes: { type: 'number' },
+      available_minutes: { type: 'number' },
+      critical_path: { type: 'array', items: { type: 'string' } },
       calendar_blocks: {
-        type: 'ARRAY',
+        type: 'array',
         items: {
-          type: 'OBJECT',
+          type: 'object',
           properties: {
-            subtask_id: { type: 'STRING' },
-            suggested_start: { type: 'STRING' },
-            duration_minutes: { type: 'NUMBER' },
-            title: { type: 'STRING' },
+            subtask_id: { type: 'string' },
+            suggested_start: { type: 'string' },
+            duration_minutes: { type: 'number' },
+            title: { type: 'string' },
           },
           required: ['subtask_id', 'duration_minutes', 'title'],
         },
       },
-      reasoning: { type: 'STRING' },
+      reasoning: { type: 'string' },
     },
     required: ['feasible', 'subtasks', 'total_estimated_minutes', 'available_minutes', 'reasoning'],
   },
 
   TRIAGE_PLAN: {
-    type: 'OBJECT',
+    type: 'object',
     properties: {
-      available_minutes: { type: 'NUMBER' },
-      achievable_percentage: { type: 'NUMBER' },
-      sections_achievable: { type: 'ARRAY', items: { type: 'STRING' } },
+      available_minutes: { type: 'number' },
+      achievable_percentage: { type: 'number' },
+      sections_achievable: { type: 'array', items: { type: 'string' } },
       sections_cut: {
-        type: 'ARRAY',
+        type: 'array',
         items: {
-          type: 'OBJECT',
-          properties: { section: { type: 'STRING' }, reason: { type: 'STRING' } },
+          type: 'object',
+          properties: { section: { type: 'string' }, reason: { type: 'string' } },
           required: ['section', 'reason'],
         },
       },
       sprint_blocks: {
-        type: 'ARRAY',
+        type: 'array',
         items: {
-          type: 'OBJECT',
+          type: 'object',
           properties: {
-            block_number: { type: 'NUMBER' },
-            title: { type: 'STRING' },
-            objective: { type: 'STRING' },
-            duration_minutes: { type: 'NUMBER' },
-            deliverable: { type: 'STRING' },
-            checkin_signal: { type: 'STRING' },
-            completed: { type: 'BOOLEAN' },
+            block_number: { type: 'number' },
+            title: { type: 'string' },
+            objective: { type: 'string' },
+            duration_minutes: { type: 'number' },
+            deliverable: { type: 'string' },
+            checkin_signal: { type: 'string' },
+            completed: { type: 'boolean' },
           },
           required: ['block_number', 'title', 'objective', 'duration_minutes', 'deliverable', 'checkin_signal'],
         },
       },
       outline: {
-        type: 'ARRAY',
+        type: 'array',
         items: {
-          type: 'OBJECT',
+          type: 'object',
           properties: {
-            section: { type: 'STRING' },
-            key_points: { type: 'ARRAY', items: { type: 'STRING' } },
-            target_length: { type: 'STRING' },
+            section: { type: 'string' },
+            key_points: { type: 'array', items: { type: 'string' } },
+            target_length: { type: 'string' },
           },
           required: ['section', 'key_points', 'target_length'],
         },
       },
-      total_planned_minutes: { type: 'NUMBER' },
-      reasoning: { type: 'STRING' },
+      total_planned_minutes: { type: 'number' },
+      reasoning: { type: 'string' },
     },
     required: ['available_minutes', 'achievable_percentage', 'sections_achievable', 'sprint_blocks', 'total_planned_minutes', 'reasoning'],
   },
 
   COMMS_DRAFT: {
-    type: 'OBJECT',
+    type: 'object',
     properties: {
-      recipient_type: { type: 'STRING' },
+      recipient_type: { type: 'string' },
       email: {
-        type: 'OBJECT',
+        type: 'object',
         properties: {
-          subject_options: { type: 'ARRAY', items: { type: 'STRING' } },
-          body: { type: 'STRING' },
-          tone: { type: 'STRING' },
+          subject_options: { type: 'array', items: { type: 'string' } },
+          body: { type: 'string' },
+          tone: { type: 'string' },
         },
         required: ['subject_options', 'body', 'tone'],
       },
       message_short: {
-        type: 'OBJECT',
-        properties: { body: { type: 'STRING' }, tone: { type: 'STRING' } },
+        type: 'object',
+        properties: { body: { type: 'string' }, tone: { type: 'string' } },
         required: ['body', 'tone'],
       },
-      key_commitments: { type: 'ARRAY', items: { type: 'STRING' } },
-      reasoning: { type: 'STRING' },
+      key_commitments: { type: 'array', items: { type: 'string' } },
+      reasoning: { type: 'string' },
     },
     required: ['recipient_type', 'email', 'message_short', 'key_commitments', 'reasoning'],
   },

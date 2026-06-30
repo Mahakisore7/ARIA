@@ -1,7 +1,7 @@
 // lib/agents/build.ts
-import { getFunctionCallingModel } from '@/lib/gemini/client'
-import { ariaTools } from '@/lib/gemini/tools'
-import { PROMPTS } from '@/lib/gemini/prompts'
+import { getGroqClient, GROQ_MODEL } from '@/lib/groq/client'
+import { ariaTools } from '@/lib/groq/tools'
+import { PROMPTS } from '@/lib/groq/prompts'
 import { ariaCheck } from '@/lib/agents/validator'
 import type { SubtaskPlan } from '@/types/agents'
 
@@ -13,7 +13,7 @@ export async function runBuildAgent(
   availableMinutes: number,
   taskCategory = 'other'
 ): Promise<SubtaskPlan> {
-  const model = getFunctionCallingModel()
+  const groq = getGroqClient()
   let retryCount = 0
   let lastViolations = ''
 
@@ -22,46 +22,51 @@ export async function runBuildAgent(
       ? `Plan this task: "${taskDescription}". Deadline: ${deadlineIso}. Available time: ${availableMinutes} minutes. Category: ${taskCategory}. Use the decompose_task function.`
       : `Previous attempt failed validation. Fix these issues: ${lastViolations}. Re-run decompose_task with corrections.`
 
-    const result = await model.generateContent({
-      contents: [
-        { role: 'user', parts: [{ text: PROMPTS.BUILD_DECOMPOSE }] },
-        { role: 'model', parts: [{ text: 'Understood. I will decompose tasks using the decompose_task function and return valid structured JSON.' }] },
-        { role: 'user', parts: [{ text: userMessage }] },
+    const result = await groq.chat.completions.create({
+      model: GROQ_MODEL,
+      messages: [
+        { role: 'system', content: PROMPTS.BUILD_DECOMPOSE },
+        { role: 'assistant', content: 'Understood. I will decompose tasks using the decompose_task function and return valid structured JSON.' },
+        { role: 'user', content: userMessage },
       ],
-      tools: ariaTools as never,
+      tools: ariaTools as any,
+      tool_choice: 'auto',
+      temperature: 0.25,
+      max_tokens: 4096,
     })
 
-    const candidate = result.response.candidates?.[0]
-    if (!candidate) throw new Error('No response from Gemini')
+    const message = result.choices[0]?.message
+    if (!message) throw new Error('No response from Groq')
 
-    const part = candidate.content.parts[0]
+    // Groq decided to call a function
+    if (message.tool_calls && message.tool_calls.length > 0) {
+      const toolCall = message.tool_calls[0]
+      if (toolCall.function.name === 'decompose_task') {
+        const args = JSON.parse(toolCall.function.arguments) as {
+          task_description: string
+          deadline_iso: string
+          available_minutes: number
+          task_category?: string
+        }
 
-    // Gemini decided to call a function
-    if (part.functionCall && part.functionCall.name === 'decompose_task') {
-      const args = part.functionCall.args as {
-        task_description: string
-        deadline_iso: string
-        available_minutes: number
-        task_category?: string
+        // Execute the tool locally — generate the actual plan
+        const plan = await executeDecompose(args)
+
+        // Validate
+        const validation = ariaCheck.validateBuild(plan)
+        if (validation.passed) {
+          return plan
+        }
+
+        lastViolations = validation.violations.join('; ')
+        retryCount++
+        continue
       }
-
-      // Execute the tool locally — generate the actual plan
-      const plan = await executeDecompose(args)
-
-      // Validate
-      const validation = ariaCheck.validateBuild(plan)
-      if (validation.passed) {
-        return plan
-      }
-
-      lastViolations = validation.violations.join('; ')
-      retryCount++
-      continue
     }
 
-    // Fallback: Gemini returned text instead of function call
+    // Fallback: Groq returned text instead of function call
     // Try to parse as JSON directly
-    const text = part.text || ''
+    const text = message.content || ''
     try {
       const parsed = JSON.parse(text) as SubtaskPlan
       const validation = ariaCheck.validateBuild(parsed)
@@ -82,17 +87,7 @@ async function executeDecompose(args: {
   available_minutes: number
   task_category?: string
 }): Promise<SubtaskPlan> {
-  const { GoogleGenerativeAI } = await import('@google/generative-ai')
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
-
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash',
-    generationConfig: {
-      temperature: 0.2,
-      maxOutputTokens: 3000,
-      responseMimeType: 'application/json',
-    },
-  })
+  const groq = getGroqClient()
 
   const prompt = `${PROMPTS.BUILD_DECOMPOSE}
 
@@ -113,15 +108,19 @@ Generate a SubtaskPlan JSON with this exact structure:
   "reasoning": "2-sentence explanation of decomposition approach"
 }`
 
-  const result = await model.generateContent(prompt)
-  const text = result.response.text()
+  const result = await groq.chat.completions.create({
+    model: GROQ_MODEL,
+    messages: [{ role: 'user', content: prompt }],
+    response_format: { type: 'json_object' },
+    temperature: 0.2,
+    max_tokens: 3000,
+  })
 
-  // Clean and parse
-  const clean = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-  const plan = JSON.parse(clean) as SubtaskPlan
+  const text = result.choices[0]?.message?.content || '{}'
+  const plan = JSON.parse(text) as SubtaskPlan
 
   // Ensure completed is set on all subtasks
-  plan.subtasks = plan.subtasks.map((s) => ({ ...s, completed: false }))
+  plan.subtasks = plan.subtasks?.map((s) => ({ ...s, completed: false })) || []
 
   return plan
 }

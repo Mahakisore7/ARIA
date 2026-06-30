@@ -1,6 +1,7 @@
 // lib/agents/rescue.ts
 import { ariaCheck } from '@/lib/agents/validator'
-import { PROMPTS } from '@/lib/gemini/prompts'
+import { PROMPTS } from '@/lib/groq/prompts'
+import { getGroqClient, GROQ_MODEL } from '@/lib/groq/client'
 import type { TriagePlan, CommsDraft, RecipientType } from '@/types/agents'
 
 const MAX_RETRIES = 2
@@ -11,17 +12,7 @@ export async function runRescueAgent(
   sections: string[] = [],
   deliverableType = 'assignment'
 ): Promise<TriagePlan> {
-  const { GoogleGenerativeAI } = await import('@google/generative-ai')
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
-
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash',
-    generationConfig: {
-      temperature: 0.2,
-      maxOutputTokens: 4096,
-      responseMimeType: 'application/json',
-    },
-  })
+  const groq = getGroqClient()
 
   let lastViolations = ''
 
@@ -61,13 +52,21 @@ Generate a TriagePlan JSON with this exact structure:
 }`
 
     try {
-      const result = await model.generateContent(prompt)
-      const text = result.response.text()
-      const clean = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-      const plan = JSON.parse(clean) as TriagePlan
+      const result = await groq.chat.completions.create({
+        model: GROQ_MODEL,
+        messages: [{ role: 'user', content: prompt }],
+        response_format: { type: 'json_object' },
+        temperature: 0.2,
+        max_tokens: 4096,
+      })
+
+      const text = result.choices[0]?.message?.content || '{}'
+      const plan = JSON.parse(text) as TriagePlan
 
       // Ensure completed is false on all blocks
-      plan.sprint_blocks = plan.sprint_blocks.map((b) => ({ ...b, completed: false }))
+      if (plan.sprint_blocks) {
+        plan.sprint_blocks = plan.sprint_blocks.map((b) => ({ ...b, completed: false }))
+      }
 
       const validation = ariaCheck.validateRescue(plan)
       if (validation.passed) return plan
@@ -87,18 +86,7 @@ export async function runCommsAgent(
   deliverableStatus: string,
   revisedTimeline = 'to be determined'
 ): Promise<CommsDraft> {
-  const { GoogleGenerativeAI } = await import('@google/generative-ai')
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
-
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash',
-    generationConfig: {
-      temperature: 0.45,
-      maxOutputTokens: 2048,
-      responseMimeType: 'application/json',
-    },
-  })
-
+  const groq = getGroqClient()
   let lastViolations = ''
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
@@ -129,10 +117,16 @@ Generate a CommsDraft JSON:
 }`
 
     try {
-      const result = await model.generateContent(prompt)
-      const text = result.response.text()
-      const clean = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-      const draft = JSON.parse(clean) as CommsDraft
+      const result = await groq.chat.completions.create({
+        model: GROQ_MODEL,
+        messages: [{ role: 'user', content: prompt }],
+        response_format: { type: 'json_object' },
+        temperature: 0.45,
+        max_tokens: 2048,
+      })
+
+      const text = result.choices[0]?.message?.content || '{}'
+      const draft = JSON.parse(text) as CommsDraft
 
       const validation = ariaCheck.validateComms(draft)
       if (validation.passed) return draft
