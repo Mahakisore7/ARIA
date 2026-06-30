@@ -86,7 +86,7 @@ export default function DashboardPage() {
       {/* Header */}
       <header className="border-b-2 border-border-default bg-neutral-primary px-6 py-4 flex items-center justify-between shadow-sm sticky top-0 z-20">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-none border-2 border-border-default bg-brand flex items-center justify-center text-black text-sm font-bold shadow-2xs font-head">A</div>
+          <img src="/logo.png" alt="ARIA Logo" className="w-10 h-10 border-2 border-border-default object-cover shadow-2xs" />
           <span className="font-head text-xl text-heading tracking-tight hidden sm:block">ARIA <span className="text-body-subtle">/ DASHBOARD</span></span>
         </div>
         <div className="flex items-center gap-3">
