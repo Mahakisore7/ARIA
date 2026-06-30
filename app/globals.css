@@ -4,48 +4,94 @@
 @tailwind utilities;
 
 :root {
-  --aria-bg: #0D0D0F;
-  --aria-surface: #141416;
-  --aria-border: #1F1F23;
-  --aria-text: #F5F5F5;
-  --aria-muted: #6B7280;
-  --aria-violet: #6C63FF;
-  --aria-green: #22C55E;
-  --aria-amber: #F59E0B;
-  --aria-red: #EF4444;
+  /* Colors - Light Mode (Neobrutalism Default) */
+  --color-neutral-primary-soft: #FFFFFF;
+  --color-neutral-primary: #FFFFFF;
+  --color-neutral-secondary-soft: #F5F5F0;
+  --color-neutral-secondary-medium: #F5F5F0;
+  --color-neutral-tertiary-soft: #EBEBEB;
+  --color-neutral-tertiary-medium: #EBEBEB;
+  
+  --color-brand: #FFDB33;
+  --color-brand-soft: #FFF3C4;
+  --color-brand-strong: #FFCC00;
+  
+  --color-success: #16A34A;
+  --color-danger: #E63946;
+  --color-warning: #F59E0B;
+  
+  --color-dark: #000000;
+  --color-disabled: #F5F5F5;
+  
+  /* Text */
+  --color-heading: #000000;
+  --color-body: #5A5A5A;
+  --color-body-subtle: #6B7280;
+  --color-fg-disabled: #AEAEAE;
+  --color-fg-brand: #B8860B;
+  
+  /* Borders */
+  --color-border-default: #000000;
+  --color-border-light: #BFBFBF;
+  --color-border-brand: #FFCC00;
+  --color-border-danger: #C41E30;
+  --color-border-success: #15803D;
+  --color-border-warning: #D97706;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Colors - Dark Mode */
+    --color-neutral-primary-soft: #1A1A1A;
+    --color-neutral-primary: #1A1A1A;
+    --color-neutral-secondary-soft: #1A1A1A;
+    --color-neutral-secondary-medium: #242424;
+    --color-neutral-tertiary-soft: #1A1A1A;
+    --color-neutral-tertiary-medium: #3A3A3A;
+    
+    --color-brand: #FFDB33;
+    --color-brand-soft: #4D3F00;
+    --color-brand-strong: #FFE066;
+    
+    --color-success: #22C55E;
+    --color-danger: #E63946;
+    --color-warning: #F59E0B;
+    
+    --color-dark: #000000;
+    --color-disabled: #242424;
+    
+    /* Text */
+    --color-heading: #F5F5F5;
+    --color-body: #A0A0A0;
+    --color-body-subtle: #A0A0A0;
+    --color-fg-disabled: #5A5A5A;
+    --color-fg-brand: #FFDB33;
+    
+    /* Borders */
+    --color-border-default: #3A3A3A;
+    --color-border-light: #2E2E2E;
+    --color-border-brand: #FFE066;
+    --color-border-danger: #E63946;
+    --color-border-success: #16A34A;
+    --color-border-warning: #F59E0B;
+  }
 }
 
 * { box-sizing: border-box; }
 
 body {
-  background: var(--aria-bg);
-  color: var(--aria-text);
+  background: var(--color-neutral-primary-soft);
+  color: var(--color-body);
   min-height: 100vh;
 }
 
-/* Rescue mode body override */
-body.rescue-mode {
-  background: #1A1200;
-}
-
 /* Scrollbar */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #2D2D32; border-radius: 2px; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--color-neutral-secondary-soft); border-left: 2px solid var(--color-border-default); }
+::-webkit-scrollbar-thumb { background: var(--color-border-default); }
 
-/* Shimmer skeleton */
-.skeleton {
-  background: linear-gradient(90deg, #1F1F23 25%, #2A2A30 50%, #1F1F23 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-/* Focus ring */
+/* Focus ring override for neobrutalism */
 :focus-visible {
-  outline: 2px solid var(--aria-violet);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-brand);
 }
-
-/* Prose reset for email drafts */
-.email-body p { margin-bottom: 0.75rem; }
-.email-body p:last-child { margin-bottom: 0; }

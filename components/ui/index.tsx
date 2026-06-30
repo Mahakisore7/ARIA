@@ -1,22 +1,22 @@
 'use client'
-// components/ui/index.tsx — all UI primitives in one export
+// components/ui/index.tsx — Neobrutalism UI primitives
 import clsx from 'clsx'
 import { useEffect, type ReactNode } from 'react'
 import type { RiskLevel } from '@/types/agents'
 
 // ─── RiskBadge ───────────────────────────────────────────────────────────────
 const riskConfig: Record<RiskLevel, { cls: string; dot: string }> = {
-  LOW:      { cls: 'border-aria-green/30 bg-aria-green/10 text-aria-green',                         dot: 'bg-aria-green' },
-  MEDIUM:   { cls: 'border-yellow-500/30 bg-yellow-500/10 text-yellow-400',                         dot: 'bg-yellow-400' },
-  HIGH:     { cls: 'border-orange-500/30 bg-orange-500/10 text-orange-400',                         dot: 'bg-orange-400' },
-  CRITICAL: { cls: 'border-aria-red/40 bg-aria-red/10 text-aria-red animate-pulse-red',             dot: 'bg-aria-red' },
+  LOW:      { cls: 'border-border-success bg-success-soft text-fg-success-strong', dot: 'bg-success' },
+  MEDIUM:   { cls: 'border-border-warning bg-warning-soft text-fg-warning',        dot: 'bg-warning' },
+  HIGH:     { cls: 'border-border-warning bg-warning text-black',                  dot: 'bg-black' },
+  CRITICAL: { cls: 'border-border-danger bg-danger-soft text-fg-danger-strong',    dot: 'bg-danger' },
 }
 
 export function RiskBadge({ level, size = 'sm' }: { level: RiskLevel; size?: 'xs' | 'sm' }) {
   const c = riskConfig[level]
   return (
     <span className={clsx(
-      'inline-flex items-center gap-1.5 border rounded-full font-semibold tracking-wide',
+      'inline-flex items-center gap-1.5 border-2 rounded-none font-semibold tracking-wide shadow-xs',
       size === 'xs' ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs',
       c.cls
     )}>
@@ -37,19 +37,28 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export function Button({ variant = 'primary', size = 'md', loading, children, className, disabled, ...props }: ButtonProps) {
-  const base = 'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 whitespace-nowrap'
+  const isGhost = variant === 'ghost'
+  
+  const base = clsx(
+    'inline-flex items-center justify-center gap-2 font-semibold transition-all whitespace-nowrap box-border',
+    isGhost ? '' : 'border-2 border-border-default rounded-none shadow-sm hover:-translate-y-[1px] hover:-translate-x-[1px] hover:shadow-md active:translate-y-[2px] active:translate-x-[2px] active:shadow-2xs',
+    'disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none'
+  )
+  
   const sizes: Record<ButtonSize, string> = {
     sm: 'px-3 py-1.5 text-sm',
     md: 'px-4 py-2 text-sm',
     lg: 'px-5 py-3 text-base',
   }
+  
   const variants: Record<ButtonVariant, string> = {
-    primary:   'bg-aria-violet hover:bg-aria-violet-dim text-white shadow-sm',
-    secondary: 'bg-aria-surface border border-aria-border hover:border-aria-muted text-aria-text',
-    danger:    'bg-aria-red/10 border border-aria-red/30 hover:bg-aria-red/20 text-aria-red',
-    ghost:     'text-aria-muted hover:text-aria-text hover:bg-aria-surface',
-    amber:     'bg-aria-amber hover:bg-amber-600 text-black font-semibold',
+    primary:   'bg-brand hover:bg-brand-strong text-black',
+    secondary: 'bg-neutral-secondary-medium hover:bg-neutral-tertiary-medium text-heading',
+    danger:    'bg-danger hover:bg-danger text-white',
+    ghost:     'text-body hover:text-heading hover:bg-neutral-secondary-medium',
+    amber:     'bg-warning hover:bg-warning-strong text-black',
   }
+  
   return (
     <button
       className={clsx(base, sizes[size], variants[variant], className)}
@@ -63,12 +72,13 @@ export function Button({ variant = 'primary', size = 'md', loading, children, cl
 }
 
 // ─── Card ─────────────────────────────────────────────────────────────────────
-interface CardProps { children: ReactNode; className?: string; amber?: boolean }
-export function Card({ children, className, amber }: CardProps) {
+interface CardProps { children: ReactNode; className?: string; amber?: boolean; interactive?: boolean }
+export function Card({ children, className, amber, interactive }: CardProps) {
   return (
     <div className={clsx(
-      'rounded-xl border p-4',
-      amber ? 'bg-amber-950/30 border-aria-amber/20' : 'bg-aria-surface border-aria-border',
+      'rounded-none border-2 p-4 transition-all',
+      amber ? 'bg-warning-soft border-border-warning shadow-md' : 'bg-neutral-primary-soft border-border-default shadow-md',
+      interactive && 'cursor-pointer hover:-translate-y-[2px] hover:-translate-x-[2px] hover:shadow-lg active:translate-y-[2px] active:translate-x-[2px] active:shadow-xs',
       className
     )}>
       {children}
@@ -83,7 +93,7 @@ export function Spinner({ size = 'md', amber }: { size?: 'sm' | 'md' | 'lg'; amb
     <span className={clsx(
       'rounded-full animate-spin border-t-transparent inline-block',
       sizes[size],
-      amber ? 'border-aria-amber' : 'border-aria-violet'
+      amber ? 'border-warning' : 'border-brand-strong'
     )} />
   )
 }
@@ -101,16 +111,22 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
   if (!open) return null
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-aria-surface border border-aria-border rounded-2xl p-6 max-w-lg w-full max-h-[80vh] overflow-y-auto animate-fade-in shadow-2xl">
-        {title && <h2 className="text-base font-semibold text-aria-text mb-4 pr-6">{title}</h2>}
-        {children}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-aria-muted hover:text-aria-text transition-colors text-xl leading-none w-6 h-6 flex items-center justify-center"
-        >
-          ×
-        </button>
+      {/* Overlay - solid 50% black, NO BLUR */}
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      
+      {/* Content Container - shadow-xl (hard offset), 2px border, 0px radius */}
+      <div className="relative bg-neutral-primary border-2 border-border-default rounded-none max-w-lg w-full max-h-[80vh] flex flex-col shadow-xl">
+        
+        {/* Header */}
+        <div className="px-5 py-4 border-b-2 border-border-default flex justify-between items-center">
+          {title ? <h2 className="text-xl font-bold text-heading font-head tracking-tight">{title}</h2> : <div />}
+          <Button variant="ghost" size="sm" onClick={onClose} className="px-2 py-1 h-auto">×</Button>
+        </div>
+        
+        {/* Body */}
+        <div className="p-5 overflow-y-auto">
+          {children}
+        </div>
       </div>
     </div>
   )
@@ -120,13 +136,13 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
 interface ToastProps { message: string; type?: 'success' | 'error' | 'info'; visible: boolean }
 export function Toast({ message, type = 'info', visible }: ToastProps) {
   const colors = {
-    success: 'bg-aria-green/10 border-aria-green/30 text-aria-green',
-    error:   'bg-aria-red/10 border-aria-red/30 text-aria-red',
-    info:    'bg-aria-violet/10 border-aria-violet/30 text-aria-violet',
+    success: 'bg-success-soft border-border-success text-fg-success-strong',
+    error:   'bg-danger-soft border-border-danger text-fg-danger-strong',
+    info:    'bg-neutral-primary-soft border-border-default text-heading',
   }
   return (
     <div className={clsx(
-      'fixed bottom-4 right-4 z-50 border rounded-xl px-4 py-3 text-sm font-medium shadow-lg transition-all duration-300',
+      'fixed bottom-4 right-4 z-50 border-2 rounded-none px-4 py-3 text-sm font-semibold shadow-lg transition-all duration-300',
       colors[type],
       visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
     )}>

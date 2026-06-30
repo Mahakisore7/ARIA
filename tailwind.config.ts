@@ -1,45 +1,58 @@
 import type { Config } from 'tailwindcss'
+
 const config: Config = {
   content: ['./app/**/*.{js,ts,jsx,tsx,mdx}', './components/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
     extend: {
       colors: {
-        'aria-bg': '#0D0D0F',
-        'aria-surface': '#141416',
-        'aria-border': '#1F1F23',
-        'aria-text': '#F5F5F5',
-        'aria-muted': '#6B7280',
-        'aria-violet': '#6C63FF',
-        'aria-violet-dim': '#3D3899',
-        'aria-green': '#22C55E',
-        'aria-amber': '#F59E0B',
-        'aria-red': '#EF4444',
-        'aria-blue': '#3B82F6',
+        'neutral-primary-soft': 'var(--color-neutral-primary-soft)',
+        'neutral-primary': 'var(--color-neutral-primary)',
+        'neutral-secondary-soft': 'var(--color-neutral-secondary-soft)',
+        'neutral-secondary-medium': 'var(--color-neutral-secondary-medium)',
+        'neutral-tertiary-soft': 'var(--color-neutral-tertiary-soft)',
+        'neutral-tertiary-medium': 'var(--color-neutral-tertiary-medium)',
+        
+        'brand': 'var(--color-brand)',
+        'brand-soft': 'var(--color-brand-soft)',
+        'brand-strong': 'var(--color-brand-strong)',
+        
+        'success': 'var(--color-success)',
+        'danger': 'var(--color-danger)',
+        'warning': 'var(--color-warning)',
+        'dark': 'var(--color-dark)',
+        'disabled': 'var(--color-disabled)',
+        
+        'heading': 'var(--color-heading)',
+        'body': 'var(--color-body)',
+        'body-subtle': 'var(--color-body-subtle)',
+        'fg-disabled': 'var(--color-fg-disabled)',
+        'fg-brand': 'var(--color-fg-brand)',
+        
+        'border-default': 'var(--color-border-default)',
+        'border-light': 'var(--color-border-light)',
+        'border-brand': 'var(--color-border-brand)',
+        'border-danger': 'var(--color-border-danger)',
+        'border-success': 'var(--color-border-success)',
+        'border-warning': 'var(--color-border-warning)',
       },
-      animation: {
-        'pulse-red': 'pulse-red 2s cubic-bezier(0.4,0,0.6,1) infinite',
-        'slide-in': 'slide-in 0.2s ease-out',
-        'fade-in': 'fade-in 0.3s ease-out',
-        'shimmer': 'shimmer 1.5s infinite',
+      boxShadow: {
+        '2xs': '1px 1px 0 0 var(--color-border-default)',
+        'xs': '2px 2px 0 0 var(--color-border-default)',
+        'sm': '3px 3px 0 0 var(--color-border-default)',
+        'md': '4px 4px 0 0 var(--color-border-default)',
+        'lg': '6px 6px 0 0 var(--color-border-default)',
+        'xl': '10px 10px 0 1px var(--color-border-default)',
+        '2xl': '16px 16px 0 1px var(--color-border-default)',
       },
-      keyframes: {
-        'pulse-red': {
-          '0%,100%': { opacity: '1', boxShadow: '0 0 0 0 rgba(239,68,68,0.4)' },
-          '50%': { opacity: '0.85', boxShadow: '0 0 0 6px rgba(239,68,68,0)' },
-        },
-        'slide-in': {
-          from: { opacity: '0', transform: 'translateY(-8px)' },
-          to: { opacity: '1', transform: 'translateY(0)' },
-        },
-        'fade-in': {
-          from: { opacity: '0' },
-          to: { opacity: '1' },
-        },
-        'shimmer': {
-          '0%': { backgroundPosition: '-200% 0' },
-          '100%': { backgroundPosition: '200% 0' },
-        },
+      fontFamily: {
+        head: ['var(--font-head)', 'sans-serif'],
+        sans: ['var(--font-sans)', 'sans-serif'],
       },
+      borderRadius: {
+        'base': '0px',
+        'default': '0px',
+        'sm': '0px',
+      }
     },
   },
   plugins: [],

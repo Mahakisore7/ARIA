@@ -1,7 +1,19 @@
+import { Archivo_Black, Space_Grotesk } from 'next/font/google'
 import type { Metadata } from 'next'
 import './globals.css'
 import { AuthProvider } from '@/context/AuthContext'
 import { ModeProvider } from '@/context/ModeContext'
+
+const archivoBlack = Archivo_Black({ 
+  weight: '400', 
+  subsets: ['latin'],
+  variable: '--font-head'
+})
+
+const spaceGrotesk = Space_Grotesk({ 
+  subsets: ['latin'],
+  variable: '--font-sans'
+})
 
 export const metadata: Metadata = {
   title: 'ARIA — Autonomous Rescue & Intervention Agent',
@@ -10,8 +22,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className="bg-aria-bg text-aria-text antialiased" style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" }}>
+    <html lang="en" className={`${archivoBlack.variable} ${spaceGrotesk.variable}`}>
+      <body className="bg-[var(--color-neutral-primary-soft)] text-[var(--color-body)] antialiased font-sans">
         <AuthProvider>
           <ModeProvider>
             {children}
