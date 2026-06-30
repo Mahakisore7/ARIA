@@ -4,25 +4,32 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { Button, Card } from '@/components/ui/index'
+import { Zap, ShieldCheck, Siren } from 'lucide-react'
 
 const features = [
   {
     mode: 'BUILD',
-    icon: '⚡',
+    icon: <Zap className="w-10 h-10 text-black" strokeWidth={2} />,
     title: 'Build Mode',
     description: 'Drop any task. ARIA decomposes it, estimates time, finds calendar gaps, and builds your execution plan — in seconds.',
+    bgHover: 'group-hover:bg-brand',
+    iconBg: 'bg-brand'
   },
   {
     mode: 'SHIELD',
-    icon: '🛡',
+    icon: <ShieldCheck className="w-10 h-10 text-black" strokeWidth={2} />,
     title: 'Shield Mode',
     description: 'ARIA monitors your active tasks and flags deadline risk before you realize you have a problem.',
+    bgHover: 'group-hover:bg-success',
+    iconBg: 'bg-success'
   },
   {
     mode: 'RESCUE',
-    icon: '🚨',
+    icon: <Siren className="w-10 h-10 text-white" strokeWidth={2} />,
     title: 'Rescue Mode',
     description: 'Deadline in hours? ARIA triages your situation, builds a sprint plan, and drafts the stakeholder email — autonomously.',
+    bgHover: 'group-hover:bg-danger',
+    iconBg: 'bg-danger'
   },
 ]
 
@@ -107,10 +114,12 @@ export default function LandingPage() {
         <div className="max-w-[1152px] mx-auto w-full">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-[32px]">
             {features.map((f, i) => (
-              <Card key={f.mode} interactive className="bg-neutral-primary text-left group">
-                <div className="text-[36px] mb-4 group-hover:-translate-y-1 transition-transform">{f.icon}</div>
-                <h3 className="text-[24px] font-head text-heading leading-[1.3] mb-4 border-b-2 border-border-default pb-2 inline-block">{f.title}</h3>
-                <p className="text-body text-[16px] leading-[1.7]">{f.description}</p>
+              <Card key={f.mode} interactive className={`bg-neutral-primary text-left group overflow-hidden transition-colors duration-300 ${f.bgHover}`}>
+                <div className={`mb-6 p-4 inline-block border-2 border-border-default shadow-xs group-hover:shadow-md group-hover:-translate-y-1 transition-all duration-300 ${f.iconBg}`}>
+                  {f.icon}
+                </div>
+                <h3 className="text-[28px] font-head text-heading group-hover:text-black leading-[1.3] mb-4 border-b-2 border-border-default pb-2 inline-block transition-colors">{f.title}</h3>
+                <p className="text-body text-[16px] leading-[1.7] group-hover:text-black/80 transition-colors font-medium">{f.description}</p>
               </Card>
             ))}
           </div>
