@@ -126,9 +126,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="px-6 py-8 border-t-2 border-border-default bg-neutral-primary-soft text-center text-body-subtle font-semibold text-sm">
-        Built for Vibe2Ship 2026 · Powered by Gemini 2.0 Flash + Firebase · Google AI Studio
-      </footer>
     </main>
   )
 }
