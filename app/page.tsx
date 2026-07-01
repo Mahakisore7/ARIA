@@ -60,7 +60,7 @@ export default function LandingPage() {
           <img src="/logo.png" alt="ARIA Logo" className="w-8 h-8 border-2 border-border-default object-cover shadow-2xs" />
           <span className="font-head text-xl text-heading tracking-tight">ARIA</span>
         </div>
-        <a href="https://github.com" target="_blank" rel="noreferrer" className="font-semibold text-heading hover:text-fg-brand transition-colors underline hover:no-underline">
+        <a href="https://github.com/Mahakisore7/ARIA" target="_blank" rel="noreferrer" className="font-semibold text-heading hover:text-fg-brand transition-colors underline hover:no-underline">
           GitHub →
         </a>
       </nav>
