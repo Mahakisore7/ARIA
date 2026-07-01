@@ -79,7 +79,13 @@ export default function DashboardPage() {
   }
 
   const criticalCount = tasks.filter((t) => t.risk_level === 'CRITICAL').length
-  const activeTasks = tasks.filter((t) => t.status === 'active' || t.status === 'rescued')
+  const activeTasks = tasks.filter((t) => {
+    if (t.status !== 'active' && t.status !== 'rescued') return false
+    const totalCount = t.subtasks?.length || 0
+    if (totalCount === 0) return true
+    const completedCount = t.subtasks?.filter(s => s.completed).length || 0
+    return completedCount < totalCount
+  })
 
   return (
     <div className="min-h-screen flex flex-col bg-neutral-secondary-soft font-sans text-body">
